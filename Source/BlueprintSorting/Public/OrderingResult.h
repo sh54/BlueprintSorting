@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Object.h"
+#include "UObject/ObjectMacros.h"
+#include "UObject/TextProperty.h"
 #include "OrderingResult.generated.h"
 
 enum class ESortDirection : uint8;
@@ -31,5 +33,20 @@ public:
 
     UFUNCTION()
     static bool IsFirstAfterSecond(UOrderingResult* OrderingResult, ESortDirection SortDirection);
+
+    UFUNCTION(BlueprintCallable, Category = Sorting)
+        void SetForInt(int32 R);
+    
+    UFUNCTION(BlueprintCallable, Category = Sorting)
+        void SetForFloat(float R, float Epsilon);
+
+    UFUNCTION(BlueprintCallable, Category = Sorting)
+        void SetForInts(int32 A, int32 B);
+
+    UFUNCTION(BlueprintCallable, Category = Sorting)
+        void SetForStrings(const FString& A, const FString& B);
+
+    UFUNCTION(BlueprintCallable, Category = Sorting)
+        void SetForTexts(const FText& A, const FText& B);
 private:
 };

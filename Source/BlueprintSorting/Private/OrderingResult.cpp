@@ -25,3 +25,61 @@ bool UOrderingResult::IsFirstAfterSecond(UOrderingResult* OrderingResult, ESortD
     }
     return OrderingResult->Result == ESortOrdering::LessThan;
 }
+
+void UOrderingResult::SetForInt(int32 R)
+{
+    if (R > 0)
+    {
+        Result = ESortOrdering::GreaterThan;
+    }
+    else if (R < 0)
+    {
+        Result = ESortOrdering::LessThan;
+    }
+    else
+    {
+        Result = ESortOrdering::Equal;
+    }
+}
+
+void UOrderingResult::SetForFloat(float R, float Epsilon)
+{
+    if (R - Epsilon > 0)
+    {
+        Result = ESortOrdering::GreaterThan;
+    }
+    else if (R + Epsilon < 0)
+    {
+        Result = ESortOrdering::LessThan;
+    }
+    else
+    {
+        Result = ESortOrdering::Equal;
+    }
+}
+
+void UOrderingResult::SetForInts(int32 A, int32 B)
+{
+    if(A > B)
+    {
+        Result = ESortOrdering::GreaterThan;
+    }
+    else if (A < B)
+    {
+        Result = ESortOrdering::LessThan;
+    }
+    else
+    {
+        Result = ESortOrdering::Equal;
+    }
+}
+
+void UOrderingResult::SetForStrings(const FString& A, const FString& B)
+{
+    return SetForInt(FCString::Strcmp(*A, *B) > 0);
+}
+
+void UOrderingResult::SetForTexts(const FText& A, const FText& B)
+{
+    return SetForInt(FCString::Strcmp(*A.ToString(), *B.ToString()) > 0);
+}
