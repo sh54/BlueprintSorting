@@ -1,0 +1,25 @@
+{
+	"FileVersion" : 3,
+	"Version" : 1,
+	"VersionName" : "0.1",
+	"FriendlyName" : "Blueprint Sorting",
+	"Description" : "Blueprint nodes that can sort arrays.",
+	"Category" : "Blueprints",
+	"CreatedBy" : "Epic Games, Inc.",
+	"CreatedByURL" : "http://TODO",
+	"DocsURL" : "",
+	"MarketplaceURL" : "",
+	"SupportURL" : "",
+	"EnabledByDefault" : true,
+	"CanContainContent" : false,
+	"IsBetaVersion" : false,
+	"Installed" : false,
+	"Modules" :
+	[
+		{
+			"Name" : "BlueprintSorting",
+			"Type" : "Developer",
+			"LoadingPhase" : "PreDefault"
+		}
+	]
+}
