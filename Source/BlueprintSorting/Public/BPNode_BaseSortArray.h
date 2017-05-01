@@ -59,5 +59,4 @@ public:
 
 protected:
     void OnArrayPinChanged();
-    void OnDelegatePinChanged();
 };

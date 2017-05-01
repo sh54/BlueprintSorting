@@ -170,12 +170,6 @@ void UBPNode_BaseSortArray::PostReconstructNode()
     {
         OnArrayPinChanged();
     }
-
-    auto DelegatePin = GetDelegatePin();
-    if (DelegatePin && DelegatePin->LinkedTo.Num() > 0)
-    {
-        OnDelegatePinChanged();
-    }
 }
 
 // TODO: use NotifyPinConnectionListChanged instead?
@@ -186,10 +180,6 @@ void UBPNode_BaseSortArray::PinConnectionListChanged(UEdGraphPin* Pin)
     {
         OnArrayPinChanged();
     } 
-    else if (Pin && (Pin->PinName == FBPNode_BaseSortArrayHelper::DelegatePinName))
-    {
-        OnDelegatePinChanged();
-    }
 }
 
 UEdGraphPin* UBPNode_BaseSortArray::GetThenPin() const
@@ -226,8 +216,16 @@ UFunction* UBPNode_BaseSortArray::GetSignatureFunction(FEdGraphPinType& PinType,
     for (TFieldIterator<UMulticastDelegateProperty> It(ClassToSearch); It; ++It)
     {
         UMulticastDelegateProperty* DelProp = *It;
+        if(!DelProp)
+        {
+            continue;
+        }
+
         UFunction* Func = It->SignatureFunction;
-        auto PropNum = It->SignatureFunction->NumParms;
+        if (!Func)
+        {
+            continue;
+        }
 
         if (Func->NumParms != 3)
         {
@@ -562,40 +560,6 @@ void UBPNode_BaseSortArray::OnArrayPinChanged()
     FBlueprintEditorUtils::MarkBlueprintAsModified(GetBlueprint());
 }
 
-// TODO: this looks like it can be removed!
-void UBPNode_BaseSortArray::OnDelegatePinChanged()
-{
-    const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
-
-    // Remove all pins related to archetype variables
-    TArray<UEdGraphPin*> OldPins = Pins;
-    TArray<UEdGraphPin*> OldClassPins;
-
-    TArray<UEdGraphPin*> NewClassPins;
-
-    auto DelegatePin = GetDelegatePin();
-    if (DelegatePin->LinkedTo.Num() > 0)
-    {
-        FEdGraphPinType PinType = DelegatePin->LinkedTo[0]->PinType;
-
-        auto Link = DelegatePin->LinkedTo[0];
-        auto LinkName = Link->GetOwningNode()->GetName();
-
-    }
-
-    RewireOldPinsToNewPins(OldClassPins, NewClassPins);
-
-    // Destroy the old pins
-    DestroyPinList(OldClassPins);
-
-    // Refresh the UI for the graph so the pin changes show up
-    UEdGraph* Graph = GetGraph();
-    Graph->NotifyGraphChanged();
-
-    // Mark dirty
-    FBlueprintEditorUtils::MarkBlueprintAsModified(GetBlueprint());
-}
-
 UFunction* UBPNode_BaseSortArray::GetDelegateSignature(bool bForceNotFromSkelClass) const
 {
     auto ArrayPin = GetTargetArrayPin();
@@ -612,14 +576,6 @@ bool UBPNode_BaseSortArray::HasExternalDependencies(TArray<class UStruct*>* Opti
 {
     const UBlueprint* SourceBlueprint = GetBlueprint();
 
-    //auto MCProperty = GetProperty();
-    //UClass* PropertySourceClass = MCProperty ? MCProperty->GetOwnerClass() : nullptr;
-    //const bool bPropertyResult = (PropertySourceClass != NULL) && (PropertySourceClass->ClassGeneratedBy != SourceBlueprint);
-    //if (bPropertyResult && OptionalOutput)
-    //{
-    //    OptionalOutput->AddUnique(PropertySourceClass);
-    //}
-
     auto Signature = GetDelegateSignature(true);
     UClass* SignatureSourceClass = Signature ? Signature->GetOwnerClass() : nullptr;
     const bool bSignatureResult = (SignatureSourceClass != NULL) && (SignatureSourceClass->ClassGeneratedBy != SourceBlueprint);
@@ -629,58 +585,8 @@ bool UBPNode_BaseSortArray::HasExternalDependencies(TArray<class UStruct*>* Opti
     }
 
     const bool bSuperResult = Super::HasExternalDependencies(OptionalOutput);
-    //return bSignatureResult || bPropertyResult || bSuperResult;
     return bSignatureResult || bSuperResult;
 }
-
-//void UBPNode_BaseSortArray::AutowireNewNode(UEdGraphPin* FromPin)
-//{
-//    const UEdGraphSchema_K2* K2Schema = Cast<UEdGraphSchema_K2>(GetSchema());
-//
-//    // Since nodes no longer have a sense of scope when they're placed, look at the connection we're coming from, and use that to coerce the Target pin
-//    if (FromPin && K2Schema)
-//    {
-//        bool bConnected = false;
-//
-//        // Only do the fixup if we're going coming from an output pin, which implies a contextual drag
-//        if (FromPin->Direction == EGPD_Output)
-//        {
-//            if (FromPin->PinType.PinSubCategoryObject.IsValid() && FromPin->PinType.PinSubCategoryObject->IsA(UClass::StaticClass()))
-//            {
-//                UProperty* DelegateProperty = DelegateReference.ResolveMember<UProperty>(GetBlueprintClassFromNode());
-//                if (DelegateProperty)
-//                {
-//                    UClass* DelegateOwner = DelegateProperty->GetOwnerClass();
-//                    if (FromPin->PinType.PinSubCategoryObject == DelegateOwner || dynamic_cast<UClass*>(FromPin->PinType.PinSubCategoryObject.Get())->IsChildOf(DelegateOwner))
-//                    {
-//                        // If we get here, then the property delegate is also available on the FromPin's class.
-//                        // Fix up the type by propagating it from the FromPin to our target pin
-//                        UEdGraphPin* TargetPin = FindPin(K2Schema->PN_Self);
-//                        TargetPin->PinType.PinSubCategory.Empty();
-//                        TargetPin->PinType.PinSubCategoryObject = DelegateOwner;
-//
-//                        // And finally, try to establish the connection
-//                        if (K2Schema->TryCreateConnection(FromPin, TargetPin))
-//                        {
-//                            bConnected = true;
-//
-//                            DelegateReference.SetFromField<UProperty>(DelegateProperty, false);
-//                            TargetPin->bHidden = false;
-//                            FromPin->GetOwningNode()->NodeConnectionListChanged();
-//                            this->NodeConnectionListChanged();
-//                        }
-//
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (!bConnected)
-//        {
-//            Super::AutowireNewNode(FromPin);
-//        }
-//    }
-//}
 
 FText UBPNode_BaseSortArray::GetMenuCategory() const
 {
