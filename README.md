@@ -6,6 +6,8 @@ Overview
 
 BlueprintSorting is a plugin for [Unreal Engine 4](https://www.unrealengine.com/) that allows arrays to be sorted with functions in-place in blueprints.
 
+For examples check out the [Blueprint Sorting Examples repository](https://github.com/sh54/BlueprintSortingExamples).
+
 One custom node is included in this plugin along with a few helpers.
 
 ![Image of sorting](Images/SortingExample.png)
