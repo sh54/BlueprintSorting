@@ -117,6 +117,8 @@ The other way to provide an ordering event is to connect the *Sort Array* node t
 
 This allows some function to be used. This function can either be in the same blueprint or supplied by another object.
 
+![Image of sorting an array with a function](Images/SortingExampleUsingFunction.png)
+
 
 Internal details
 ----------------
