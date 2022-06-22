@@ -22,15 +22,15 @@ public:
 
     UFUNCTION(CustomThunk)
     static void SwapItems(const TArray<int32>& TargetArray, int32& Index1, int32& Index2);
-    static void SwapItems_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index1, int32 Index2);
+    static void SwapItems_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index1, int32 Index2);
 
     UFUNCTION(CustomThunk)
     static bool GreaterThanOrEqualArrayLength(const TArray<int32>& TargetArray, int32& Index);
-    static bool GreaterThanOrEqualArrayLength_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index);
+    static bool GreaterThanOrEqualArrayLength_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index);
 
     UFUNCTION(CustomThunk)
     static bool LessThanOrEqualArrayLength(const TArray<int32>& TargetArray, int32& Index);
-    static bool LessThanOrEqualArrayLength_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index);
+    static bool LessThanOrEqualArrayLength_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index);
 
     UFUNCTION(CustomThunk)
     static void TestItem(int32& TargetItem);
@@ -44,17 +44,17 @@ public:
     DECLARE_FUNCTION(execSwapItems)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UArrayProperty>(NULL);
+        Stack.StepCompiledIn<FArrayProperty>(NULL);
         void* ArrayAddr = Stack.MostRecentPropertyAddress;
-        UArrayProperty* ArrayProperty = Cast<UArrayProperty>(Stack.MostRecentProperty);
+        FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
         if (!ArrayProperty)
         {
             Stack.bArrayContextFailed = true;
             return;
         }
 
-        P_GET_PROPERTY(UIntProperty, Index1);
-        P_GET_PROPERTY(UIntProperty, Index2);
+        P_GET_PROPERTY(FIntProperty, Index1);
+        P_GET_PROPERTY(FIntProperty, Index2);
 
         P_FINISH;
         P_NATIVE_BEGIN;
@@ -65,16 +65,16 @@ public:
     DECLARE_FUNCTION(execGreaterThanOrEqualArrayLength)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UArrayProperty>(NULL);
+        Stack.StepCompiledIn<FArrayProperty>(NULL);
         void* ArrayAddr = Stack.MostRecentPropertyAddress;
-        UArrayProperty* ArrayProperty = Cast<UArrayProperty>(Stack.MostRecentProperty);
+        FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
         if (!ArrayProperty)
         {
             Stack.bArrayContextFailed = true;
             return;
         }
 
-        P_GET_PROPERTY(UIntProperty, Index);
+        P_GET_PROPERTY(FIntProperty, Index);
 
         P_FINISH;
         P_NATIVE_BEGIN;
@@ -85,16 +85,16 @@ public:
     DECLARE_FUNCTION(execLessThanOrEqualArrayLength)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UArrayProperty>(NULL);
+        Stack.StepCompiledIn<FArrayProperty>(NULL);
         void* ArrayAddr = Stack.MostRecentPropertyAddress;
-        UArrayProperty* ArrayProperty = Cast<UArrayProperty>(Stack.MostRecentProperty);
+        FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
         if (!ArrayProperty)
         {
             Stack.bArrayContextFailed = true;
             return;
         }
 
-        P_GET_PROPERTY(UIntProperty, Index);
+        P_GET_PROPERTY(FIntProperty, Index);
 
         P_FINISH;
         P_NATIVE_BEGIN;
@@ -105,9 +105,9 @@ public:
     DECLARE_FUNCTION(execTestItem)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property1Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property1 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property1 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property1)
         {
             Stack.bArrayContextFailed = true;
@@ -118,14 +118,14 @@ public:
         P_NATIVE_BEGIN;
             FString OutText;
 
-            UObjectProperty* ObjProp = Cast<UObjectProperty>(Property1);
+            FObjectProperty* ObjProp = CastField<FObjectProperty>(Property1);
             if (ObjProp)
             {
                 auto Obj = ObjProp->GetObjectPropertyValue(Property1Addr);
                 int32 somethign = 932854;
             }
 
-            UIntProperty* IntProp = Cast<UIntProperty>(Property1);
+            FIntProperty* IntProp = CastField<FIntProperty>(Property1);
             if (IntProp)
             {
                 auto Int = IntProp->GetSignedIntPropertyValue(Property1Addr);
@@ -142,9 +142,9 @@ public:
     DECLARE_FUNCTION(execTestTwoItems)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property1Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property1 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property1 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property1)
         {
             Stack.bArrayContextFailed = true;
@@ -152,9 +152,9 @@ public:
         }
 
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property2Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property2 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property2 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property2)
         {
             Stack.bArrayContextFailed = true;
@@ -166,14 +166,14 @@ public:
             FString OutText;
 
             {
-                UObjectProperty* ObjProp = Cast<UObjectProperty>(Property1);
+                FObjectProperty* ObjProp = CastField<FObjectProperty>(Property1);
                 if (ObjProp)
                 {
                     auto Obj = ObjProp->GetObjectPropertyValue(Property1Addr);
                     int32 somethign = 932854;
                 }
 
-                UIntProperty* IntProp = Cast<UIntProperty>(Property1);
+                FIntProperty* IntProp = CastField<FIntProperty>(Property1);
                 if (IntProp)
                 {
                     auto Int = IntProp->GetSignedIntPropertyValue(Property1Addr);
@@ -182,14 +182,14 @@ public:
             }
 
             {
-                UObjectProperty* ObjProp = Cast<UObjectProperty>(Property2);
+                FObjectProperty* ObjProp = CastField<FObjectProperty>(Property2);
                 if (ObjProp)
                 {
                     auto Obj = ObjProp->GetObjectPropertyValue(Property2Addr);
                     int32 somethign = 932854;
                 }
 
-                UIntProperty* IntProp = Cast<UIntProperty>(Property2);
+                FIntProperty* IntProp = CastField<FIntProperty>(Property2);
                 if (IntProp)
                 {
                     auto Int = IntProp->GetSignedIntPropertyValue(Property2Addr);
@@ -206,9 +206,9 @@ public:
     DECLARE_FUNCTION(execTestThreeItems)
     {
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property1Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property1 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property1 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property1)
         {
             Stack.bArrayContextFailed = true;
@@ -216,9 +216,9 @@ public:
         }
 
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property2Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property2 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property2 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property2)
         {
             Stack.bArrayContextFailed = true;
@@ -226,9 +226,9 @@ public:
         }
 
         Stack.MostRecentProperty = nullptr;
-        Stack.StepCompiledIn<UProperty>(NULL);
+        Stack.StepCompiledIn<FProperty>(NULL);
         void* Property3Addr = Stack.MostRecentPropertyAddress;
-        UProperty* Property3 = Cast<UProperty>(Stack.MostRecentProperty);
+        FProperty* Property3 = CastField<FProperty>(Stack.MostRecentProperty);
         if (!Property3)
         {
             Stack.bArrayContextFailed = true;
@@ -240,14 +240,14 @@ public:
             FString OutText;
 
             {
-                UObjectProperty* ObjProp = Cast<UObjectProperty>(Property1);
+                FObjectProperty* ObjProp = CastField<FObjectProperty>(Property1);
                 if (ObjProp)
                 {
                     auto Obj = ObjProp->GetObjectPropertyValue(Property1Addr);
                     int32 somethign = 932854;
                 }
 
-                UIntProperty* IntProp = Cast<UIntProperty>(Property1);
+                FIntProperty* IntProp = CastField<FIntProperty>(Property1);
                 if (IntProp)
                 {
                     auto Int = IntProp->GetSignedIntPropertyValue(Property1Addr);
@@ -256,14 +256,14 @@ public:
             }
 
             {
-                UObjectProperty* ObjProp = Cast<UObjectProperty>(Property2);
+                FObjectProperty* ObjProp = CastField<FObjectProperty>(Property2);
                 if (ObjProp)
                 {
                     auto Obj = ObjProp->GetObjectPropertyValue(Property2Addr);
                     int32 somethign = 932854;
                 }
 
-                UIntProperty* IntProp = Cast<UIntProperty>(Property2);
+                FIntProperty* IntProp = CastField<FIntProperty>(Property2);
                 if (IntProp)
                 {
                     auto Int = IntProp->GetSignedIntPropertyValue(Property2Addr);
@@ -272,14 +272,14 @@ public:
             }
 
             {
-                UObjectProperty* ObjProp = Cast<UObjectProperty>(Property3);
+                FObjectProperty* ObjProp = CastField<FObjectProperty>(Property3);
                 if (ObjProp)
                 {
                     auto Obj = ObjProp->GetObjectPropertyValue(Property3Addr);
                     int32 somethign = 932854;
                 }
 
-                UIntProperty* IntProp = Cast<UIntProperty>(Property3);
+                FIntProperty* IntProp = CastField<FIntProperty>(Property3);
                 if (IntProp)
                 {
                     auto Int = IntProp->GetSignedIntPropertyValue(Property3Addr);

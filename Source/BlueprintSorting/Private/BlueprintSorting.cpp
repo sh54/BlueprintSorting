@@ -1,7 +1,7 @@
 #include "CoreMinimal.h"
 
-#include "Modules/ModuleManager.h"
 #include "BlueprintSorting.h"
+#include "Modules/ModuleManager.h"
 
 
 void BlueprintSorting::StartupModule()

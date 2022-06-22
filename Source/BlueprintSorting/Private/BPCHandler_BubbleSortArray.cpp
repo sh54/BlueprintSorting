@@ -49,7 +49,7 @@ void BPCHandler_BubbleSortArray::CompileSort(FKismetFunctionContext& Context, UE
     UEdGraphPin* ExecTriggeringPin = Context.FindRequiredPinByName(ArrayNode, UEdGraphSchema_K2::PN_Execute, EGPD_Input);
     if ((ExecTriggeringPin == NULL) || !Context.ValidatePinType(ExecTriggeringPin, ExpectedExecPinType))
     {
-        CompilerContext.MessageLog.Error(*FString::Printf(*LOCTEXT("NoValidExecutionPinForSortArray_Error", "@@ must have a valid execution pin @@").ToString()), ArrayNode, ExecTriggeringPin);
+        CompilerContext.MessageLog.Error(*LOCTEXT("NoValidExecutionPinForSortArray_Error", "@@ must have a valid execution pin @@").ToString(), ArrayNode, ExecTriggeringPin);
         return;
     }
 
@@ -57,7 +57,7 @@ void BPCHandler_BubbleSortArray::CompileSort(FKismetFunctionContext& Context, UE
     FBPTerminal* OrderingFunctionContext = FindFunctionContext(Context, Node);
     if(!OrderingFunction)
     {
-        CompilerContext.MessageLog.Error(*FString::Printf(*LOCTEXT("NoValidFunctionForSortArray_Error", "Unable to find a vaild sort function to call for @@").ToString()), ArrayNode);
+        CompilerContext.MessageLog.Error(*LOCTEXT("NoValidFunctionForSortArray_Error", "Unable to find a valid sort function to call for @@").ToString(), ArrayNode);
         return;
     }
 
@@ -138,7 +138,7 @@ void BPCHandler_BubbleSortArray::CompileSort(FKismetFunctionContext& Context, UE
         MainLoopPtr = &MainLoop;
     }
 
-    // Assign inital no swaps monitor variable to true
+    // Assign initial no swaps monitor variable to true
     {
         FBPTerminal* LiteralTerm = Context.CreateLocalTerminal(ETerminalSpecification::TS_Literal);
         LiteralTerm->bIsLiteral = true;
@@ -235,7 +235,7 @@ void BPCHandler_BubbleSortArray::CompileSort(FKismetFunctionContext& Context, UE
         Statement.RHS.Add(*DirectionTerm);
     }
 
-    // If if the first item should go after the second item then we will swap the elements and mark that a swap has been made
+    // If the first item should go after the second item then we will swap the elements and mark that a swap has been made
     // Otherwise jump this
     {
         FBlueprintCompiledStatement& JumpOverSwap = Context.AppendStatementForNode(Node);
@@ -318,7 +318,7 @@ void BPCHandler_BubbleSortArray::CompileSort(FKismetFunctionContext& Context, UE
         JumpInnerLoopStart.TargetLabel = InnerLoopPtr;
     }
 
-    // If any swaps occured then jump back and check orderings of all adjacent pairs
+    // If any swaps occurred then jump back and check orderings of all adjacent pairs
     {
         FBlueprintCompiledStatement& JumpInnerLoopStart = Context.AppendStatementForNode(Node);
         JumpInnerLoopStart.Type = KCST_GotoIfNot;
