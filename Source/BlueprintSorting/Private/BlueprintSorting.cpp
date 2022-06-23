@@ -1,6 +1,6 @@
-#include "CoreMinimal.h"
-
 #include "BlueprintSorting.h"
+
+#include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
 

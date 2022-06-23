@@ -1,5 +1,5 @@
-#include "CoreMinimal.h"
 #include "BPNode_BaseSortArray.h"
+#include "CoreMinimal.h"
 #include "BPCHandler_BubbleSortArray.h"
 #include "Engine/Blueprint.h"
 #include "Engine/MemberReference.h"

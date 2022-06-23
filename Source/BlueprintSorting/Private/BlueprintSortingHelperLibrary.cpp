@@ -1,6 +1,6 @@
-#include "CoreMinimal.h"
-
 #include "BlueprintSortingHelperLibrary.h"
+
+#include "CoreMinimal.h"
 
 void UBlueprintSortingHelperLibrary::SwapItems_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index1, int32 Index2)
 {

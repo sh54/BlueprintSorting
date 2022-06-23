@@ -1,7 +1,8 @@
-#include "CoreMinimal.h"
-
 #include "BPNode_SortArray.h"
 #include "BPCHandler_BubbleSortArray.h"
+
+#include "CoreMinimal.h"
+
 
 #define LOCTEXT_NAMESPACE "BlueprintSorting"
 

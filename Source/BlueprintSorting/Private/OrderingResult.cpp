@@ -1,7 +1,7 @@
-#include "CoreMinimal.h"
-
 #include "OrderingResult.h"
 #include "BPNode_BaseSortArray.h"
+
+#include "CoreMinimal.h"
 
 
 UOrderingResult::UOrderingResult( const FObjectInitializer& ObjectInitializer )
