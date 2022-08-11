@@ -1,8 +1,8 @@
-#include "CoreMinimal.h"
-
 #include "BlueprintSortingHelperLibrary.h"
 
-void UBlueprintSortingHelperLibrary::SwapItems_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index1, int32 Index2)
+#include "CoreMinimal.h"
+
+void UBlueprintSortingHelperLibrary::SwapItems_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index1, int32 Index2)
 {
     if (TargetArray)
     {
@@ -12,7 +12,7 @@ void UBlueprintSortingHelperLibrary::SwapItems_Impl(void* TargetArray, const UAr
     }
 }
 
-bool UBlueprintSortingHelperLibrary::GreaterThanOrEqualArrayLength_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index)
+bool UBlueprintSortingHelperLibrary::GreaterThanOrEqualArrayLength_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index)
 {
     if (TargetArray)
     {
@@ -25,7 +25,7 @@ bool UBlueprintSortingHelperLibrary::GreaterThanOrEqualArrayLength_Impl(void* Ta
     return false;
 }
 
-bool UBlueprintSortingHelperLibrary::LessThanOrEqualArrayLength_Impl(void* TargetArray, const UArrayProperty* ArrayProp, int32 Index)
+bool UBlueprintSortingHelperLibrary::LessThanOrEqualArrayLength_Impl(void* TargetArray, const FArrayProperty* ArrayProp, int32 Index)
 {
     if (TargetArray)
     {

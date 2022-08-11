@@ -1,5 +1,5 @@
-#include "CoreMinimal.h"
 #include "BPNode_BaseSortArray.h"
+#include "CoreMinimal.h"
 #include "BPCHandler_BubbleSortArray.h"
 #include "Engine/Blueprint.h"
 #include "Engine/MemberReference.h"
@@ -22,13 +22,13 @@
 
 struct FBPNode_BaseSortArrayHelper
 {
-    static FString DelegatePinName;
-    static FString ArrayPinName;
-    static FString SortDirectionPinName;
+    static FName DelegatePinName;
+    static FName ArrayPinName;
+    static FName SortDirectionPinName;
 };
-FString FBPNode_BaseSortArrayHelper::DelegatePinName(TEXT("Delegate"));
-FString FBPNode_BaseSortArrayHelper::ArrayPinName(TEXT("Array"));
-FString FBPNode_BaseSortArrayHelper::SortDirectionPinName(TEXT("Sort Direction"));
+FName FBPNode_BaseSortArrayHelper::DelegatePinName(TEXT("Delegate"));
+FName FBPNode_BaseSortArrayHelper::ArrayPinName(TEXT("Array"));
+FName FBPNode_BaseSortArrayHelper::SortDirectionPinName(TEXT("Sort Direction"));
 
 UBPNode_BaseSortArray::UBPNode_BaseSortArray(const FObjectInitializer &ObjectInitializer)
     : Super(ObjectInitializer)
@@ -56,7 +56,7 @@ void UBPNode_BaseSortArray::ValidateNodeDuringCompilation(class FCompilerResults
 
     if(ArrayPin->PinType.PinCategory == K2Schema->PC_Wildcard)
     {
-        MessageLog.Error(*FString::Printf(*NSLOCTEXT("K2Node", "BaseSortArrayNotAssignable", "Array input must have a type. Connect it to something. @@").ToString()), this);
+        MessageLog.Error(*NSLOCTEXT("K2Node", "BaseSortArrayNotAssignable", "Array input must have a type. Connect it to something. @@").ToString(), this);
     }
     else
     {
@@ -74,14 +74,14 @@ void UBPNode_BaseSortArray::ValidateNodeDuringCompilation(class FCompilerResults
                 }
                 else
                 {
-                    TypeToSort = ArrayPin->PinType.PinCategory;
+                    TypeToSort = ArrayPin->PinType.PinCategory.ToString();
                 }
             }
             else
             {
-                TypeToSort = ArrayPin->PinType.PinCategory;
+                TypeToSort = ArrayPin->PinType.PinCategory.ToString();
             }
-            MessageLog.Error(*FString::Printf(*NSLOCTEXT("K2Node", "BaseSortArray_MissingSignature", "Signature is missing. Create a (dummy) event dispatcher with a signature of %s, %s, OrderingResult. @@").ToString(), *TypeToSort, *TypeToSort), this);
+            MessageLog.Error(*FString::Format(*NSLOCTEXT("K2Node", "BaseSortArray_MissingSignature", "Signature is missing. Create a (dummy) event dispatcher with a signature of {0}, {1}, OrderingResult. @@").ToString(), { *TypeToSort, *TypeToSort }), this);
         }
     }
 
@@ -105,7 +105,7 @@ UK2Node::ERedirectType UBPNode_BaseSortArray::DoPinsMatchForReconstruction(const
     {
         if ((OldPin->PinType.PinCategory == K2Schema->PC_Delegate) &&
             (NewPin->PinType.PinCategory == K2Schema->PC_Delegate) &&
-            (FCString::Stricmp(*(NewPin->PinName), *(OldPin->PinName)) == 0))
+            (NewPin->PinName == OldPin->PinName))
         {
             return ERedirectType_Name;
         }
@@ -119,14 +119,16 @@ void UBPNode_BaseSortArray::AllocateDefaultPins()
 
     const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
 
-    CreatePin(EGPD_Input, K2Schema->PC_Exec, TEXT(""), NULL, false, false, K2Schema->PN_Execute);
-    CreatePin(EGPD_Output, K2Schema->PC_Exec, TEXT(""), NULL, false, false, K2Schema->PN_Then);
+    CreatePin(EGPD_Input, K2Schema->PC_Exec, TEXT(""), nullptr, K2Schema->PN_Execute);
+    CreatePin(EGPD_Output, K2Schema->PC_Exec, TEXT(""), nullptr, K2Schema->PN_Then);
 
     UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESortDirection"), true);
-    CreatePin(EGPD_Input, K2Schema->PC_Byte, TEXT(""), EnumPtr, false, false, FBPNode_BaseSortArrayHelper::SortDirectionPinName);
+    CreatePin(EGPD_Input, K2Schema->PC_Byte, TEXT(""), EnumPtr, FBPNode_BaseSortArrayHelper::SortDirectionPinName);
     GetSortDirectionPin()->DefaultValue = "Ascending";
 
-    CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, TEXT(""), NULL, true, false, FBPNode_BaseSortArrayHelper::ArrayPinName);
+    FCreatePinParams PinParams;
+    PinParams.ContainerType = EPinContainerType::Array;
+    CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, FName(TEXT("")), nullptr, FBPNode_BaseSortArrayHelper::ArrayPinName, PinParams);
 }
 
 void UBPNode_BaseSortArray::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins)
@@ -150,7 +152,10 @@ void UBPNode_BaseSortArray::ReallocatePinsDuringReconstruction(TArray<UEdGraphPi
         {
             const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
 
-            auto DelegatePin = CreatePin(EGPD_Input, K2Schema->PC_Delegate, TEXT(""), NULL, false, true, FBPNode_BaseSortArrayHelper::DelegatePinName, true);
+            FCreatePinParams PinParams;
+            PinParams.bIsReference = true;
+            PinParams.bIsConst = true;
+            auto DelegatePin = CreatePin(EGPD_Input, K2Schema->PC_Delegate, TEXT(""), nullptr, FBPNode_BaseSortArrayHelper::DelegatePinName, PinParams);
             if (DelegatePin)
             {
                 UFunction* SignatureFunction = GetSignatureFunction(ArrayPin->PinType);
@@ -213,9 +218,9 @@ UFunction* UBPNode_BaseSortArray::GetSignatureFunction(FEdGraphPinType& PinType,
         return nullptr;
     }
 
-    for (TFieldIterator<UMulticastDelegateProperty> It(ClassToSearch); It; ++It)
+    for (TFieldIterator<FMulticastDelegateProperty> It(ClassToSearch); It; ++It)
     {
-        UMulticastDelegateProperty* DelProp = *It;
+        FMulticastDelegateProperty* DelProp = *It;
         if(!DelProp)
         {
             continue;
@@ -235,7 +240,7 @@ UFunction* UBPNode_BaseSortArray::GetSignatureFunction(FEdGraphPinType& PinType,
         bool Relevant = true;
 
         int32 PropertyIndex = 0;
-        for (TFieldIterator<UProperty> PIt(Func); PIt; ++PIt, ++PropertyIndex)
+        for (TFieldIterator<FProperty> PIt(Func); PIt; ++PIt, ++PropertyIndex)
         {
             if (PIt->PropertyFlags & CPF_OutParm)
             {
@@ -254,7 +259,7 @@ UFunction* UBPNode_BaseSortArray::GetSignatureFunction(FEdGraphPinType& PinType,
 
             if (PropertyIndex < 2)
             {
-                if (PropType.bIsArray || PropType.bIsMap || PropType.bIsSet)
+                if (PropType.ContainerType != EPinContainerType::None)
                 {
                     Relevant = false;
                     break;
@@ -281,7 +286,7 @@ UFunction* UBPNode_BaseSortArray::GetSignatureFunction(FEdGraphPinType& PinType,
 
             if (PropertyIndex == 2)
             {
-                if (PropType.bIsArray || PropType.bIsMap || PropType.bIsSet)
+                if (PropType.ContainerType != EPinContainerType::None)
                 {
                     Relevant = false;
                     break;
@@ -383,14 +388,14 @@ UFunction* UBPNode_BaseSortArray::GetFunction(FEdGraphPinType& PinType) const
         bool Relevant = true;
 
         int32 PropertyIndex = 0;
-        for (TFieldIterator<UProperty> PIt(*It); PIt; ++PIt, ++PropertyIndex)
+        for (TFieldIterator<FProperty> PIt(*It); PIt; ++PIt, ++PropertyIndex)
         {
             FEdGraphPinType PropType;
             K2Schema->ConvertPropertyToPinType(*PIt, PropType);
 
             if (PropertyIndex < 2)
             {
-                if (PropType.bIsArray || PropType.bIsMap || PropType.bIsSet)
+                if (PropType.ContainerType != EPinContainerType::None)
                 {
                     Relevant = false;
                     break;
@@ -414,7 +419,7 @@ UFunction* UBPNode_BaseSortArray::GetFunction(FEdGraphPinType& PinType) const
 
             if (PropertyIndex == 2)
             {
-                if (PropType.bIsArray || PropType.bIsMap || PropType.bIsSet)
+                if (PropType.ContainerType != EPinContainerType::None)
                 {
                     Relevant = false;
                     break;
@@ -449,7 +454,7 @@ bool UBPNode_BaseSortArray::AreSameSignatures(const UEdGraphSchema_K2* K2Schema,
         return false;
     }
 
-    for (TFieldIterator<UProperty> ItA(SigA), ItB(SigB); ItA, ItB; ++ItA, ++ItB)
+    for (TFieldIterator<FProperty> ItA(SigA), ItB(SigB); ItA, ItB; ++ItA, ++ItB)
     {
         FEdGraphPinType PropTypeA;
         FEdGraphPinType PropTypeB;
@@ -482,7 +487,7 @@ void UBPNode_BaseSortArray::OnArrayPinChanged()
         FEdGraphPinType PinType = ArrayPin->LinkedTo[0]->PinType;
 
         ArrayPin->PinType = PinType;
-        ArrayPin->PinType.bIsArray = true;
+        ArrayPin->PinType.ContainerType = EPinContainerType::Array;
         ArrayPin->PinType.bIsReference = false;
 
         UBlueprint* Blueprint = GetBlueprint();
@@ -512,12 +517,15 @@ void UBPNode_BaseSortArray::OnArrayPinChanged()
             {
                 if (DelegatePin)
                 {
-                    DelegatePin->MarkPendingKill();
+                    DelegatePin->MarkAsGarbage();
                     Pins.Remove(DelegatePin);
                     OldClassPins.Add(DelegatePin);
                 }
 
-                DelegatePin = CreatePin(EGPD_Input, K2Schema->PC_Delegate, TEXT(""), NULL, false, true, FBPNode_BaseSortArrayHelper::DelegatePinName, true);
+                FCreatePinParams PinParams;
+                PinParams.bIsConst = true;
+                PinParams.bIsReference = true;
+                DelegatePin = CreatePin(EGPD_Input, K2Schema->PC_Delegate, TEXT(""), nullptr, FBPNode_BaseSortArrayHelper::DelegatePinName, PinParams);
                 if (DelegatePin)
                 {
                     FMemberReference::FillSimpleMemberReference<UFunction>(SignatureFunction, DelegatePin->PinType.PinSubCategoryMemberReference);
@@ -531,7 +539,7 @@ void UBPNode_BaseSortArray::OnArrayPinChanged()
 
             if (DelegatePin)
             {
-                DelegatePin->MarkPendingKill();
+                DelegatePin->MarkAsGarbage();
                 Pins.Remove(DelegatePin);
                 OldClassPins.Add(DelegatePin);
             }
@@ -541,13 +549,13 @@ void UBPNode_BaseSortArray::OnArrayPinChanged()
     {
         if (DelegatePin)
         {
-            DelegatePin->MarkPendingKill();
+            DelegatePin->MarkAsGarbage();
             Pins.Remove(DelegatePin);
             OldClassPins.Add(DelegatePin);
         }
     }
 
-    RewireOldPinsToNewPins(OldClassPins, NewClassPins);
+    RewireOldPinsToNewPins(OldClassPins, NewClassPins, nullptr);
 
     // Destroy the old pins
     DestroyPinList(OldClassPins);

@@ -1,8 +1,8 @@
-#include "CoreMinimal.h"
-
 #include "BPCHandler_BaseSortArray.h"
 #include "BPNode_BaseSortArray.h"
 #include "BlueprintSortingHelperLibrary.h"
+
+#include "CoreMinimal.h"
 #include "Engine/Blueprint.h"
 #include "Engine/MemberReference.h"
 #include "BlueprintActionDatabaseRegistrar.h"
